@@ -34,7 +34,7 @@ public class DbService : IDbService
                 FirstName = ct.IdClientNavigation.FirstName,
                 LastName = ct.IdClientNavigation.LastName,
             }).ToList(),
-        }).ToListAsync();
+        }).OrderBy(e => e.DateFrom).ToListAsync();
 
         return trips;
     }
