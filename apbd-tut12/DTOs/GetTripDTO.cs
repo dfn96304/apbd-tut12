@@ -2,6 +2,18 @@
 
 namespace apbd_tut12.DTOs;
 
+public class GetTripsDTO
+{
+    public ICollection<GetTripDTO> Trips { get; set; }
+}
+
+public class GetPaginatedTripsDTO : GetTripsDTO
+{
+    public int PageNum { get; set; }
+    public int PageSize { get; set; }
+    public int AllPages { get; set; }
+}
+
 public class GetTripDTO
 {
     public string Name { get; set; }

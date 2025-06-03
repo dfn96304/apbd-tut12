@@ -4,7 +4,7 @@ namespace apbd_tut12.Services;
 
 public interface IDbService
 {
-    public Task<List<GetTripDTO>> GetAllTrips();
+    public Task<GetTripsDTO> GetAllTrips(int? page, int? pageSize);
     public Task RemoveClient(int idClient);
     public Task AssignClientToTrip(AssignClientToTripDTO assignClientToTripDto);
 }

@@ -16,9 +16,9 @@ public class DbService : IDbService
         _context = context;
     }
 
-    public async Task<List<GetTripDTO>> GetAllTrips()
+    public async Task<GetTripsDTO> GetAllTrips(int? page, int? pageSize)
     {
-        var trips = await _context.Trips.Select(e => new GetTripDTO()
+        var tripsList = await _context.Trips.Select(e => new GetTripDTO()
         {
             Name = e.Name,
             Description = e.Description,
@@ -34,9 +34,49 @@ public class DbService : IDbService
                 FirstName = ct.IdClientNavigation.FirstName,
                 LastName = ct.IdClientNavigation.LastName,
             }).ToList(),
-        }).OrderBy(e => e.DateFrom).ToListAsync();
+        }).OrderByDescending(e => e.DateFrom).ToListAsync();
 
-        return trips;
+        if (page != null)
+        {
+            if (pageSize == null)
+                pageSize = 20;
+            if(pageSize < 1)
+                throw new ArgumentException("Page size must be greater than 0.");
+            if(page < 1)
+                throw new ArgumentException("Page number must be equal to or greater than 1.");
+            var start = (page.Value - 1) * pageSize.Value;
+            var length = pageSize.Value;
+
+            if (start > tripsList.Count-1)
+            {
+                throw new ArgumentException("Page number is past the last page.");
+            }
+            
+            if (start + length > tripsList.Count)
+            {
+                length = tripsList.Count - start;
+            }
+            
+            
+            
+            var trips = new GetPaginatedTripsDTO()
+            {
+                AllPages = (tripsList.Count / pageSize.Value) + (tripsList.Count % pageSize.Value == 0 ? 0 : 1),
+                PageSize = length,
+                PageNum = page.Value,
+                Trips = tripsList.Slice(start, length),
+            };
+            return trips;
+        }
+        else
+        {
+            var trips = new GetTripsDTO()
+            {
+                Trips = tripsList,
+            };
+            return trips;
+        }
+        
     }
 
     public async Task RemoveClient(int idClient)

@@ -17,10 +17,17 @@ public class TripsController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetAllTrips()
+    public async Task<IActionResult> GetAllTrips([FromQuery] int? page, [FromQuery] int? pageSize)
     {
-        var patients = await _dbService.GetAllTrips();
-        return Ok(patients);
+        try
+        {
+            var patients = await _dbService.GetAllTrips(page, pageSize);
+            return Ok(patients);
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
     }
     
     [HttpPost("{idTrip}/clients")]
