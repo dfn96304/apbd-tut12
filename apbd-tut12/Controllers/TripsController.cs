@@ -23,7 +23,7 @@ public class TripsController : ControllerBase
     }
     
     [HttpPost("{idTrip}/clients")]
-    public async Task<IActionResult> AssignClientToTrip(AssignClientToTripDTO assignClientToTripDto, int idTrip)
+    public async Task<IActionResult> AssignClientToTrip([FromBody] AssignClientToTripDTO assignClientToTripDto, int idTrip)
     {
         return Ok();
     }

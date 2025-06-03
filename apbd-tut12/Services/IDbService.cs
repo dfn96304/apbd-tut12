@@ -5,4 +5,5 @@ namespace apbd_tut12.Services;
 public interface IDbService
 {
     public Task<List<GetTripDTO>> GetAllTrips();
+    public Task RemoveClient(int idClient);
 }

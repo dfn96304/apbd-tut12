@@ -1,4 +1,5 @@
-﻿using apbd_tut12.Services;
+﻿using System.Data;
+using apbd_tut12.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace apbd_tut12.Controllers;
@@ -17,6 +18,18 @@ public class ClientsController : ControllerBase
     [HttpDelete("{idClient}")]
     public async Task<IActionResult> DeleteClient(int idClient)
     {
-        return NoContent();
+        try
+        {
+            await _dbService.RemoveClient(idClient);
+            return NoContent();
+        }
+        catch (FileNotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (ConstraintException e)
+        {
+            return Conflict(e.Message);
+        }
     }
 }
