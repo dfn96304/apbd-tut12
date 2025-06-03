@@ -6,4 +6,5 @@ public interface IDbService
 {
     public Task<List<GetTripDTO>> GetAllTrips();
     public Task RemoveClient(int idClient);
+    public Task AssignClientToTrip(AssignClientToTripDTO assignClientToTripDto);
 }

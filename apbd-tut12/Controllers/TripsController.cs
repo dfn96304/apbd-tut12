@@ -1,4 +1,5 @@
-﻿using apbd_tut12.DTOs;
+﻿using System.Data;
+using apbd_tut12.DTOs;
 using apbd_tut12.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,8 +24,21 @@ public class TripsController : ControllerBase
     }
     
     [HttpPost("{idTrip}/clients")]
-    public async Task<IActionResult> AssignClientToTrip([FromBody] AssignClientToTripDTO assignClientToTripDto, int idTrip)
+    public async Task<IActionResult> AssignClientToTrip([FromBody] AssignClientToTripDTO assignClientToTripDto)
     {
+        try
+        {
+            await _dbService.AssignClientToTrip(assignClientToTripDto);
+        }
+        catch (FileNotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (ConstraintException e)
+        {
+            return Conflict(e.Message);
+        }
+
         return Ok();
     }
 }
