@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices.JavaScript;
 using apbd_tut12.Data;
 using apbd_tut12.DTOs;
+using apbd_tut12.Exceptions;
 using apbd_tut12.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,15 +42,15 @@ public class DbService : IDbService
             if (pageSize == null)
                 pageSize = 20;
             if(pageSize < 1)
-                throw new ArgumentException("Page size must be greater than 0.");
+                throw new BadHttpRequestException("Page size must be greater than 0.");
             if(page < 1)
-                throw new ArgumentException("Page number must be equal to or greater than 1.");
+                throw new BadHttpRequestException("Page number must be equal to or greater than 1.");
             var start = (page.Value - 1) * pageSize.Value;
             var length = pageSize.Value;
 
             if (start > tripsList.Count-1)
             {
-                throw new ArgumentException("Page number is past the last page.");
+                throw new BadHttpRequestException("Page number is past the last page.");
             }
             
             if (start + length > tripsList.Count)
@@ -85,12 +86,12 @@ public class DbService : IDbService
             .FirstOrDefaultAsync(c => c.IdClient == idClient);
         if (client == null)
         {
-            throw new FileNotFoundException("Client with id " + idClient + " not found");
+            throw new NotFoundException("Client with id " + idClient + " not found");
         }
 
         if (client.ClientTrips.Count > 0)
         {
-            throw new ConstraintException("Client is assigned to " + client.ClientTrips.Count + " trips");
+            throw new ConflictException("Client is assigned to " + client.ClientTrips.Count + " trips");
         }
         
         _context.Clients.Remove(client);
@@ -106,7 +107,7 @@ public class DbService : IDbService
                 bool clientAlreadyExists = _context.Clients.Any(c => c.Pesel == assignClientToTripDto.Pesel);
                 if (clientAlreadyExists)
                 {
-                    throw new ConstraintException("A client with this PESEL already exists");
+                    throw new ConflictException("A client with this PESEL already exists");
                 }
                 // 1 OK
 
@@ -115,7 +116,7 @@ public class DbService : IDbService
                     c.ClientTrips.Any(ct => ct.IdTrip == assignClientToTripDto.IdTrip));
                 if (alreadyRegistered)
                 {
-                    throw new ConstraintException("A Client with this PESEL is already registered for this Trip");
+                    throw new ConflictException("A Client with this PESEL is already registered for this Trip");
                 }
                 // 2 OK
 
@@ -123,8 +124,8 @@ public class DbService : IDbService
                     .FirstOrDefaultAsync(t => t.IdTrip == assignClientToTripDto.IdTrip);
                 if (trip == null)
                 {
-                    throw new FileNotFoundException("A Trip with the ID " + assignClientToTripDto.IdTrip +
-                                                    " was not found");
+                    throw new NotFoundException("A Trip with the ID " + assignClientToTripDto.IdTrip +
+                                                " was not found");
                 }
 
                 var dateTimeNow = DateTime.Now;
@@ -132,7 +133,7 @@ public class DbService : IDbService
                 // the given trip exists
                 if (trip.DateFrom <= dateTimeNow)
                 {
-                    throw new ConstraintException("This Trip has already started/occured");
+                    throw new ConflictException("This Trip has already started/occured");
                 }
                 // 3 OK
 

@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using apbd_tut12.DTOs;
+using apbd_tut12.Exceptions;
 using apbd_tut12.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +25,7 @@ public class TripsController : ControllerBase
             var patients = await _dbService.GetAllTrips(page, pageSize);
             return Ok(patients);
         }
-        catch (ArgumentException e)
+        catch (BadHttpRequestException e)
         {
             return BadRequest(e.Message);
         }
@@ -37,11 +38,11 @@ public class TripsController : ControllerBase
         {
             await _dbService.AssignClientToTrip(assignClientToTripDto);
         }
-        catch (FileNotFoundException e)
+        catch (NotFoundException e)
         {
             return NotFound(e.Message);
         }
-        catch (ConstraintException e)
+        catch (ConflictException e)
         {
             return Conflict(e.Message);
         }

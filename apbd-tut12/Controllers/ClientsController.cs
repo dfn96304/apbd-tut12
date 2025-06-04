@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using apbd_tut12.Exceptions;
 using apbd_tut12.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,11 +24,11 @@ public class ClientsController : ControllerBase
             await _dbService.RemoveClient(idClient);
             return NoContent();
         }
-        catch (FileNotFoundException e)
+        catch (NotFoundException e)
         {
             return NotFound(e.Message);
         }
-        catch (ConstraintException e)
+        catch (ConflictException e)
         {
             return Conflict(e.Message);
         }
